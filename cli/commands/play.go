@@ -76,6 +76,54 @@ type GameState struct {
 	outputFile  io.WriteCloser
 	idGenerator func(int) string
 }
+type Player struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
+// Plain method interface to launching a new game
+func PlayBattlesnakeGame(players []Player, outputPath string) error {
+		// Initialize a new GameState
+		gameState := &GameState{
+				// Set default values for the game configuration
+				Width:               11,
+				Height:              11,
+				Timeout:             500,
+				Sequential:          false,
+				GameType:            "standard",
+				MapName:             "standard",
+				ViewMap:             false,
+				UseColor:            false,
+				Seed:                time.Now().UTC().UnixNano(),
+				TurnDelay:           0,
+				TurnDuration:        0,
+				OutputPath:          outputPath,
+				ViewInBrowser:       false,
+				BoardURL:            "https://board.battlesnake.com",
+				FoodSpawnChance:     15,
+				MinimumFood:         1,
+				HazardDamagePerTurn: 14,
+				ShrinkEveryNTurns:   25,
+		}
+
+		// Populate names and URLs from the players slice
+		for _, player := range players {
+				gameState.Names = append(gameState.Names, player.Name)
+				gameState.URLs = append(gameState.URLs, player.URL)
+		}
+
+		// Initialize the game state
+		if err := gameState.Initialize(); err != nil {
+				return fmt.Errorf("error initializing game: %v", err)
+		}
+
+		// Run the game
+		if err := gameState.Run(); err != nil {
+				return fmt.Errorf("error running game: %v", err)
+		}
+
+		return nil
+}
 
 func NewPlayCommand() *cobra.Command {
 	gameState := &GameState{}
