@@ -70,21 +70,17 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-
 	// Get the characters from line 2 col 12-48 of the request body
 	gameID := string(gameData[7:43])
 	fmt.Printf("Game ID: %v", gameID)
 	// fmt.Println("Game Data: %v", string(gameData))
 
-	
 	// Store the game data in the Replit database
 	err = db.Set(gameID, string(gameData))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error storing game data: %v", err), http.StatusInternalServerError)
 		return
 	}
-
 
 	// Send the game file as a response
 	http.ServeFile(w, r, tmpFile.Name())

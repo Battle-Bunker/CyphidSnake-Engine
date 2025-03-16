@@ -16,6 +16,7 @@ type BoardServer struct {
 	game   Game
 	events chan GameEvent // channel for sending events from the game runner to the browser client
 	done   chan bool      // channel for signalling (via closing) that all events have been sent to the browser client
+	//TODO add a reference to a kv store for storing game data
 
 	httpServer *http.Server
 }
@@ -46,6 +47,7 @@ func NewBoardServer(game Game) *BoardServer {
 
 // Handle the /games/:id request made by the board to fetch the game metadata.
 func (server *BoardServer) handleGame(w http.ResponseWriter, r *http.Request) {
+	//TODO if the current game does not exist or doesn't have the ID of the game requested, look for a game with the requested ID in the kv store
 	w.Header().Add("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(struct {
 		Game Game

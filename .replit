@@ -1,4 +1,4 @@
- modules = ["go"]
+modules = ["go", "python-3.11"]
  run = "go run server/main.go"
  
  [gitHubImport]
