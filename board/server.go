@@ -35,7 +35,12 @@ func NewBoardServer(game Game) *BoardServer {
 		events: make(chan GameEvent, 1000), // buffered channel to allow game to run ahead of browser client
 		done:   make(chan bool),
 		httpServer: &http.Server{
-			Handler: cors.Default().Handler(mux),
+			Handler: cors.New(cors.Options{
+				AllowedOrigins:   []string{"*"},
+				AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+				AllowedHeaders:   []string{"*"},
+				AllowCredentials: true,
+			}).Handler(mux),
 		},
 	}
 
