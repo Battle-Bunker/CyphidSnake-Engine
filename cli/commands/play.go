@@ -83,6 +83,11 @@ type Player struct {
 
 // Plain method interface to launching a new game
 func PlayBattlesnakeGame(players []Player, outputPath string) error {
+		// Get Board_URL from env variable
+		boardURL := os.Getenv("BOARD_URL")
+		if boardURL == "" {
+			boardURL = "https://board.battlesnake.com"
+		}
 		// Initialize a new GameState
 		gameState := &GameState{
 				// Set default values for the game configuration
@@ -99,7 +104,7 @@ func PlayBattlesnakeGame(players []Player, outputPath string) error {
 				TurnDuration:        0,
 				OutputPath:          outputPath,
 				ViewInBrowser:       false,
-				BoardURL:            "https://board.battlesnake.com",
+				BoardURL:            boardURL,
 				FoodSpawnChance:     15,
 				MinimumFood:         1,
 				HazardDamagePerTurn: 14,

@@ -84,6 +84,9 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Send the game file as a response
 	http.ServeFile(w, r, tmpFile.Name())
+	
+	//TODO: return url to this game running on Board e.g. %BOARD_URL%?gameID=$gameID
+	
 
 }
 
