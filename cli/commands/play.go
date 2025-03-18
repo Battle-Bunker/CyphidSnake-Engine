@@ -82,52 +82,54 @@ type Player struct {
 }
 
 // Plain method interface to launching a new game
-func PlayBattlesnakeGame(players []Player, outputPath string) error {
-		// Get Board_URL from env variable
-		boardURL := os.Getenv("BOARD_URL")
-		if boardURL == "" {
-			boardURL = "https://board.battlesnake.com"
-		}
-		// Initialize a new GameState
-		gameState := &GameState{
-				// Set default values for the game configuration
-				Width:               11,
-				Height:              11,
-				Timeout:             500,
-				Sequential:          false,
-				GameType:            "standard",
-				MapName:             "standard",
-				ViewMap:             false,
-				UseColor:            false,
-				Seed:                time.Now().UTC().UnixNano(),
-				TurnDelay:           0,
-				TurnDuration:        0,
-				OutputPath:          outputPath,
-				ViewInBrowser:       false,
-				BoardURL:            boardURL,
-				FoodSpawnChance:     15,
-				MinimumFood:         1,
-				HazardDamagePerTurn: 14,
-				ShrinkEveryNTurns:   25,
-		}
+func PlayBattlesnakeGame(players []Player, outputPath string) (string, error) {
+	// Get Board_URL from env variable
+	boardURL := os.Getenv("BOARD_URL")
+	if boardURL == "" {
+		boardURL = "https://board.battlesnake.com"
+	}
+	// Initialize a new GameState
+	gameState := &GameState{
+		// Set default values for the game configuration
+		Width:               11,
+		Height:              11,
+		Timeout:             500,
+		Sequential:          false,
+		GameType:            "standard",
+		MapName:             "standard",
+		ViewMap:             false,
+		UseColor:            false,
+		Seed:                time.Now().UTC().UnixNano(),
+		TurnDelay:           0,
+		TurnDuration:        0,
+		OutputPath:          outputPath,
+		ViewInBrowser:       false,
+		BoardURL:            boardURL,
+		FoodSpawnChance:     15,
+		MinimumFood:         1,
+		HazardDamagePerTurn: 14,
+		ShrinkEveryNTurns:   25,
+	}
 
-		// Populate names and URLs from the players slice
-		for _, player := range players {
-				gameState.Names = append(gameState.Names, player.Name)
-				gameState.URLs = append(gameState.URLs, player.URL)
-		}
+	// Populate names and URLs from the players slice
+	for _, player := range players {
+		gameState.Names = append(gameState.Names, player.Name)
+		gameState.URLs = append(gameState.URLs, player.URL)
+	}
 
-		// Initialize the game state
-		if err := gameState.Initialize(); err != nil {
-				return fmt.Errorf("error initializing game: %v", err)
-		}
+	// Initialize the game state
+	if err := gameState.Initialize(); err != nil {
+		return "", fmt.Errorf("error initializing game: %v", err)
+	}
 
-		// Run the game
+	// Run the game in a goroutine
+	go func() {
 		if err := gameState.Run(); err != nil {
-				return fmt.Errorf("error running game: %v", err)
+			log.ERROR.Printf("Error running game: %v", err)
 		}
+	}()
 
-		return nil
+	return gameState.gameID, nil
 }
 
 func NewPlayCommand() *cobra.Command {
@@ -810,7 +812,7 @@ func (gameState *GameState) buildFrameEvent(boardState *rules.BoardState) board.
 		if snakeState.Error != nil {
 			// Instead of trying to keep in sync with the production engine's
 			// error detection and messages, just show a generic error and rely
-			// on the CLI logs to show what really happened.
+			//// on the CLI logs to show what really happened.
 			convertedSnake.Error = "0:Error communicating with server"
 		} else if snakeState.StatusCode != http.StatusOK {
 			convertedSnake.Error = fmt.Sprintf("7:Bad HTTP status code %d", snakeState.StatusCode)

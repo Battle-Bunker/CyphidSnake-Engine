@@ -57,7 +57,7 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 	defer os.Remove(tmpFile.Name()) // Clean up the file afterwards
 
 	// Call PlayBattlesnakeGame with the collection of players and output path
-	err = commands.PlayBattlesnakeGame(req.Players, tmpFile.Name())
+	gameID, err := commands.PlayBattlesnakeGame(req.Players, tmpFile.Name())
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error playing game: %v", err), http.StatusInternalServerError)
 		return
