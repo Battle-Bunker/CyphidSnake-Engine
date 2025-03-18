@@ -127,6 +127,7 @@ func PlayBattlesnakeGame(players []Player, outputPath string) (string, error) {
 		if err := gameState.Run(); err != nil {
 			log.ERROR.Printf("Error running game: %v", err)
 		}
+		fmt.Printf("Game %v has finished\n", gameState.gameID)
 	}()
 
 	return gameState.gameID, nil
@@ -812,7 +813,7 @@ func (gameState *GameState) buildFrameEvent(boardState *rules.BoardState) board.
 		if snakeState.Error != nil {
 			// Instead of trying to keep in sync with the production engine's
 			// error detection and messages, just show a generic error and rely
-			//// on the CLI logs to show what really happened.
+			// on the CLI logs to show what really happened.
 			convertedSnake.Error = "0:Error communicating with server"
 		} else if snakeState.StatusCode != http.StatusOK {
 			convertedSnake.Error = fmt.Sprintf("7:Bad HTTP status code %d", snakeState.StatusCode)

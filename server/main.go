@@ -70,9 +70,7 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the characters from line 2 col 12-48 of the request body
-	gameID := string(gameData[7:43])
-	fmt.Printf("Game ID: %v", gameID)
+	fmt.Printf("Game %v started\n", gameID)
 	// fmt.Println("Game Data: %v", string(gameData))
 
 	// Store the game data in the Replit database
@@ -83,11 +81,19 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send the game file as a response
-	http.ServeFile(w, r, tmpFile.Name())
-	
-	//TODO: return url to this game running on Board e.g. %BOARD_URL%?gameID=$gameID
-	
+	// http.ServeFile(w, r, tmpFile.Name())
 
+	boardURL := os.Getenv("BOARD_URL")
+	if boardURL == "" {
+		boardURL = "https://board.battlesnake.com"
+	}
+	gameURL := fmt.Sprintf("%s/?game=%s", boardURL, gameID)
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(gameURL))
+
+	//TODO: return url to this game running on Board e.g. %BOARD_URL%?game=$gameID
+	// return fmt.Sprintf("%s/?game=%s", boardURL, gameID)
 }
 
 // indexHandler handles the GET requests to the index page
