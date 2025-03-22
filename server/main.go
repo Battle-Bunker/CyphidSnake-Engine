@@ -22,23 +22,15 @@ type IndexResponse struct {
 	Status string `json:"status"`
 }
 
-var persistentServer *board.PersistentBoardServer
-
 func main() {
-	// Create persistent board server
-	persistentServer = board.NewPersistentBoardServer()
-	serverURL, err := persistentServer.Listen()
-	if err != nil {
-		log.Fatal(fmt.Sprintf("Failed to start persistent server: %v", err))
-	}
-	defer persistentServer.Shutdown()
-
-	// Set up routes
+	// Set up a route and handler function
 	http.HandleFunc("/play", playHandler)
+
+	// Set up a route and handler function for the index page
 	http.HandleFunc("/", indexHandler)
 
-	fmt.Printf("Board server listening on %s\n", serverURL)
-	fmt.Println("Game server is running on http://0.0.0.0:8080")
+	// Start the HTTP server
+	fmt.Println("Server is running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
@@ -90,27 +82,6 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Send the game file as a response
 	// http.ServeFile(w, r, tmpFile.Name())
-
-	// Create and register the game with persistent server
-	boardGame := board.Game{
-		ID:     gameID,
-		Status: "running",
-		Width:  11,  // You may want to make these configurable
-		Height: 11,
-		Ruleset: map[string]string{
-			"name": "standard",
-		},
-		RulesetName: "standard",
-		RulesStages: []string{},
-	}
-	persistentServer.RegisterGame(boardGame)
-
-	// Store the game data for later retrieval
-	err = db.Set(gameID, string(gameData))
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error storing game data: %v", err), http.StatusInternalServerError)
-		return
-	}
 
 	boardURL := os.Getenv("BOARD_URL")
 	if boardURL == "" {
