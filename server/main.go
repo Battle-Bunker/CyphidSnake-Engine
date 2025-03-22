@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var persistentServer *PersistentBoardServer
+var persistentServer *board.PersistentBoardServer
 var gameID string
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -32,7 +32,7 @@ type IndexResponse struct {
 }
 
 func main() {
-	persistentServer = NewPersistentBoardServer()
+	persistentServer = board.NewPersistentBoardServer()
 	
 	router := mux.NewRouter()
 	router.HandleFunc("/play", playHandler).Methods("POST")
