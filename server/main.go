@@ -35,6 +35,24 @@ func main() {
 	persistentServer = board.NewPersistentBoardServer()
 	
 	router := mux.NewRouter()
+	
+	// Add CORS middleware
+	corsMiddleware := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
+			
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			
+			next.ServeHTTP(w, r)
+		})
+	}
+	
+	router.Use(corsMiddleware)
 	router.HandleFunc("/play", playHandler).Methods("POST")
 	router.HandleFunc("/games/{gameID}", gameHandler).Methods("GET")
 	router.HandleFunc("/games/{gameID}/events", eventsHandler).Methods("GET")
