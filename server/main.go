@@ -70,9 +70,9 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 
 	boardURL := os.Getenv("BOARD_URL")
 	if boardURL == "" {
-		boardURL = "https://board.battlesnake.com"
+		boardURL = "https://board.battlesnake.com/"
 	}
-	gameURL := fmt.Sprintf("%s/?game=%s", boardURL, gameID)
+	gameURL := fmt.Sprintf("%s?game=%s", boardURL, gameID)
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.Write([]byte(gameURL))
