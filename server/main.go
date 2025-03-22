@@ -50,7 +50,8 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gameID, err := commands.PlayBattlesnakeGame(req.Players)
+	tempFile := fmt.Sprintf("/tmp/battlesnake-%s.json", gameID)
+	gameID, err := commands.PlayBattlesnakeGame(req.Players, tempFile)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error playing game: %v", err), http.StatusInternalServerError)
 		return
