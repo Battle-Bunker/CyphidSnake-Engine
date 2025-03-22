@@ -1,4 +1,3 @@
-
 package board
 
 import (
@@ -10,9 +9,9 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
+	db "github.com/replit/database-go"
 	"github.com/rs/cors"
 	log "github.com/spf13/jwalterweatherman"
-	db "github.com/replit/database-go"
 )
 
 type PersistentBoardServer struct {
