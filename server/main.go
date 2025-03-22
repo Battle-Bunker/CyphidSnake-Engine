@@ -95,7 +95,7 @@ func playHandler(w http.ResponseWriter, r *http.Request) {
 	gameURL := fmt.Sprintf("%s?game=%s", boardURL, gameID)
 
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte(gameURL))
+	w.Write([]byte(gameURL + "\n"))
 }
 
 func gameHandler(w http.ResponseWriter, r *http.Request) {
