@@ -15,9 +15,9 @@ type PersistentBoardServer struct {
 }
 
 type GameState struct {
-	game    Game
-	events  []GameEvent
-	isLive  bool
+	game   Game
+	events []GameEvent
+	isLive bool
 }
 
 func NewPersistentBoardServer() *PersistentBoardServer {
@@ -32,9 +32,9 @@ func (s *PersistentBoardServer) AddGame(game Game) *GameState {
 	defer s.mu.Unlock()
 
 	gameState := &GameState{
-		game:    game,
-		events:  make([]GameEvent, 0),
-		isLive:  true,
+		game:   game,
+		events: make([]GameEvent, 0),
+		isLive: true,
 	}
 	s.activeGames[game.ID] = gameState
 	s.eventChans[game.ID] = make([]chan GameEvent, 0)
@@ -47,7 +47,7 @@ func (s *PersistentBoardServer) SendEvent(gameID string, event GameEvent) {
 
 	if gameState, exists := s.activeGames[gameID]; exists {
 		gameState.events = append(gameState.events, event)
-		
+
 		// Send to all active websocket connections
 		for _, ch := range s.eventChans[gameID] {
 			ch <- event
@@ -72,14 +72,14 @@ func (s *PersistentBoardServer) SubscribeToGame(gameID string) (chan GameEvent, 
 	if gameState, exists := s.activeGames[gameID]; exists {
 		ch := make(chan GameEvent, 100)
 		s.eventChans[gameID] = append(s.eventChans[gameID], ch)
-		
+
 		// Send existing events
 		go func() {
 			for _, event := range gameState.events {
 				ch <- event
 			}
 		}()
-		
+
 		return ch, nil
 	}
 
