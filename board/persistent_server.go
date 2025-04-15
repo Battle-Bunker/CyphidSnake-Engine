@@ -66,16 +66,21 @@ func (s *PersistentBoardServer) SendEvent(gameID string, event GameEvent) {
 
 func (s *PersistentBoardServer) SubscribeToGame(gameID string) (chan GameEvent, error) {
 	s.mu.Lock()
+	fmt.Printf("Subscribing to event stream for %v \n", gameID)
 	defer s.mu.Unlock()
 
 	// First check active games
 	if gameState, exists := s.activeGames[gameID]; exists {
+		fmt.Printf("Game %v is active \n", gameID)
+
 		ch := make(chan GameEvent, 100)
 		s.eventChans[gameID] = append(s.eventChans[gameID], ch)
 
 		// Send existing events
 		go func() {
+			fmt.Printf("Starting goroutine for %v \n", gameID)
 			for _, event := range gameState.events {
+				fmt.Printf("Sending an event for %v \n", gameID)
 				ch <- event
 			}
 		}()

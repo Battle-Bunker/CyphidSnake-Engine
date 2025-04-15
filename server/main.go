@@ -122,15 +122,21 @@ func eventsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Websocket upgrade failed: %v", err)
 		return
 	}
-	defer ws.Close()
+	defer func() {
+		fmt.Printf("Closing WebSocket for game %v \n", gameID)
+		ws.Close()
+	}()
+	fmt.Printf("Websocket connection for GameID %v is established \n", gameID)
 
 	eventsChan, err := persistentServer.SubscribeToGame(gameID)
 	if err != nil {
+		fmt.Printf("ERROR! Couldn't subscribe to game\n")
 		ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, err.Error()))
 		return
 	}
 
 	for event := range eventsChan {
+		fmt.Printf("Sending event to WebSocket \n")
 		if err := ws.WriteJSON(event); err != nil {
 			if !strings.Contains(err.Error(), "websocket: close") {
 				log.Printf("Websocket write error: %v", err)
@@ -138,6 +144,8 @@ func eventsHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+
+	fmt.Printf("All events have been written \n")
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
